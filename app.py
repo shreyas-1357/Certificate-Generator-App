@@ -84,7 +84,7 @@ st.markdown(background_style, unsafe_allow_html=True)
 
 # 🎓 **Title Section**
 st.markdown("<div class='title-container'><h1>🎓 CP-T Automated Certificate Generator & Sender</h1></div>", unsafe_allow_html=True)
-st.markdown("<p class='subtext'>Now you can send a certificate to a specific individual without uploading a CSV file.</p>", unsafe_allow_html=True)
+st.markdown("<p class='subtext'>Now you can send a certificate to a specific also, Just pull the arrow at left hand.</p>", unsafe_allow_html=True)
 
 # ✅ **Success Message Placeholder (Initially Empty)**
 success_message = st.empty()
@@ -147,7 +147,7 @@ def send_email(name, recipient_email, date, course, cert_io):
             msg["From"] = SENDER_EMAIL
             msg["To"] = recipient_email
             msg["Subject"] = f"🎓 Your Certificate for {course}"
-            msg.set_content(f"Dear {name},\n\nCongratulations! Your certificate for {course} on {date} is attached.\n\nBest regards,\nYour Organization")
+            msg.set_content(f"Dear {name},\n\nCongratulations! Your certificate for {course} on {date} is attached.\n\nBest regards,\nCipheren Technology")
             msg.add_attachment(cert_io.getvalue(), maintype="image", subtype="png", filename=f"{name}.png")
 
             smtp_server.send_message(msg)
