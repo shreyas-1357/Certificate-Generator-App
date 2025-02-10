@@ -1,4 +1,4 @@
-import streamlit as st   
+import streamlit as st     
 import pandas as pd
 from PIL import Image, ImageDraw, ImageFont
 import smtplib
@@ -23,6 +23,8 @@ SENDER_PASSWORD = os.getenv("EMAIL_PASSWORD")
 TEMPLATE_PATH = "templates/certificate_template1.png"
 FONT_NAME_PATH = "fonts/PlayfairDisplay-VariableFont_wght.ttf"
 FONT_DATE_PATH = "fonts/Cardo-Regular.ttf"
+BACKGROUND_IMAGE = "assets/future.jpg"  # High-resolution futuristic background
+LOGO_PATH = "assets/logo.svg"  # ✅ Added for Page Icon
 
 # ✅ Font Settings
 FONT_SIZE_NAME = 90
@@ -44,19 +46,68 @@ Your Organization
 """
 
 # ---- STREAMLIT UI ----
-st.set_page_config(page_title="Certificate Generator", page_icon="🎓", layout="wide")
+st.set_page_config(page_title="Certificate Generator", page_icon=LOGO_PATH, layout="wide")  # ✅ Updated with logo.svg
 
-# ---- HEADER ----
-st.markdown("<h1 style='text-align: center; color: #2E86C1;'>🎓 CP-T Automated Certificate Generator & Sender</h1>", unsafe_allow_html=True)
+# 🔥 **Apply Futuristic Background to the Entire Web App**
+background_style = f"""
+    <style>
+    .stApp {{
+        background: url('{BACKGROUND_IMAGE}');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+    }}
+    .title-container {{
+        background: rgba(30, 60, 114, 0.8); /* Semi-transparent background */
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        color: white;
+    }}
+    .subtext {{
+        font-size: 18px;
+        font-weight: 500;
+        color: #f0f0f0;
+        text-align: center;
+    }}
+    .success-message {{
+        font-size: 20px;
+        font-weight: bold;
+        color: lime;
+        text-align: center;
+        margin-top: 10px;
+    }}
+    </style>
+"""
+
+st.markdown(background_style, unsafe_allow_html=True)
+
+# 🎓 **Title Section**
+st.markdown("<div class='title-container'><h1>🎓 CP-T Automated Certificate Generator & Sender</h1></div>", unsafe_allow_html=True)
+st.markdown("<p class='subtext'>Now you can send a certificate to a specific individual without uploading a CSV file.</p>", unsafe_allow_html=True)
+
+# ✅ **Success Message Placeholder (Initially Empty)**
+success_message = st.empty()
+
 st.markdown("<hr>", unsafe_allow_html=True)
 
 # ---- SIDEBAR CONFIG ----
 st.sidebar.image(TEMPLATE_PATH, width=250)
 st.sidebar.title("🔧 Settings")
+
+# 📂 **CSV Upload Option**
 uploaded_file = st.sidebar.file_uploader("📂 Upload CSV File", type=["csv"])
+
+# 📌 **Send to an Individual**
+st.sidebar.markdown("### 🎯 Send to a Specific Person")
+individual_name = st.sidebar.text_input("👤 Enter Name")
+individual_email = st.sidebar.text_input("📧 Enter Email")
+
 course_name = st.sidebar.text_input("📘 Enter Course Name", value="DSA Using C++")
 selected_date = st.sidebar.date_input("📅 Select Certificate Date")
+
 generate_button = st.sidebar.button("🚀 Generate & Send Certificates")
+send_individual_button = st.sidebar.button("📩 Send to Individual")
 
 # ---- FUNCTION TO GENERATE CERTIFICATE ----
 def generate_certificate(name, date, course):
@@ -105,7 +156,16 @@ def send_email(name, recipient_email, date, course, cert_io):
     except Exception as e:
         return f"❌ Failed to send certificate to {name}: {e}"
 
-# ---- PROCESS CSV ----
+# 📌 **SEND CERTIFICATE TO ONE INDIVIDUAL**
+if send_individual_button:
+    if not individual_name or not individual_email:
+        st.sidebar.error("❌ Please enter both name and email.")
+    else:
+        cert_io = generate_certificate(individual_name, selected_date.strftime("%d-%m-%Y"), course_name)
+        result = send_email(individual_name, individual_email, selected_date.strftime("%d-%m-%Y"), course_name, cert_io)
+        success_message.markdown(f"<p class='success-message'>{result}</p>", unsafe_allow_html=True)
+
+# 📂 **PROCESS CSV FILE & SEND CERTIFICATES**
 if uploaded_file:
     df = pd.read_csv(uploaded_file)
     df.columns = df.columns.str.lower()
