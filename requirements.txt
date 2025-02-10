@@ -1,9 +1,6 @@
 streamlit
 pandas
 Pillow
-smtplib
-ssl
-email
 python-dotenv
-streamlit-authenticator
 pyyaml
+streamlit-authenticator
